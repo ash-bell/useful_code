@@ -1,3 +1,4 @@
+```
 module add MCL/14.137-intel-2016b
 module avail
 
@@ -57,3 +58,4 @@ grep -o <only print exact matches to pattern>
 cat test.fastq | paste - - - - | cut -f 2 | tr -d '\n' | wc -c #count bp in fastq
 
 grep -Fxvf Run_accession_numbers.txt files.txt #find difference beween two files
+```
