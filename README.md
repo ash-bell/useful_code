@@ -14,7 +14,7 @@ unpigz -c <filename> | sed -n '1~4s/^@/>/p;2~4p' | pigz -c > <output_file>
 column -t -s$'\t' checkm_output.txt
 
 #covert multifasta to fasta
-grep -v "^>" $i | awk 'BEGIN { ORS=""; print ">placeholder\n"} {print}' > $(basename $i .fasta)_condensed.fasta
+for i in *.faa; do grep -v "^>" $i | awk 'BEGIN { ORS=""; print ">REPLACE_ME\n"} {print}' | sed "s/^>REPLACE_ME/$(basename $i _Glimmer.faa)/g" > $(basename $i _Glimmer.faa)_condensed.faa; done
 
 # change fasta header to basename
 awk '/^>/ {gsub(/_condensed.fasta(sta)?$/,"",FILENAME);printf(">%s\n",FILENAME);next;} {print}' $i >> all_sag_and_ref_condensed.fna
