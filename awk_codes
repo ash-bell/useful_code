@@ -1,0 +1,84 @@
+FROM https://bl831.als.lbl.gov/~gmeigs/scripting_help/better_awk_examples.txt
+
+$$$$$ MATH:   $$$$$ 
+Find the remainder of 1 number divided by another use "%"
+-->>>  echo 27 5 | awk '{print $1 % $2}'   -->> 2
+
+Comparisons:   
+-->>>  echo 4 5 | awk '{if ($1 < $2)  print -$2 }'-->> -5
+-->>>  echo 2 3 | awk '{print  ($1 < $2) ?  -$2 : $2 }' -->> -3
+-->>>  echo 2 3 | awk '{print  ($1 > $2) ?  -$2 : $2 }' -->> 3
+
+Max/Min:  (this for number range from -999 to 999)
+-->>>  echo some_file.txt |\
+       awk 'BEGIN {max=-999; min=999} { {if ($1 >= max) {max = $1}  }  {if ($1 <= min)  {min = $1}  } } END {print max, min}'
+
+Generate RANDOM ORDER output from a file, assume the field to randomized is 6
+-->>>  echo some_file.txt |\
+       awk 'BEGIN{srand()} {print rand(),$6}' | sort -n | awk '{print $2}'` )
+
+$$$$$ Manipulate records and characters:   $$$$$ 
+  (use "man ascii" to find Octal values of special characters for use in "gsub" )
+
+    PRINT RECORDS within a specified range:
+ set goo = 4
+ set foo = 8
+ cat some_file.txt | awk -v start=$goo -v end=$foo '{if ((NR >= start)  && (NR <= end)) print $0}'
+
+## Find the number of records which have their last entry (Field) greater than 0
+-->>>  cat some_file.txt  | awk  '{if ($NF > 0)n++}END{print n}'
+
+## Substitute "one" word for "another"
+ -->>>  cat some_file.txt  | awk  '{gsub ("one", "another") print $0}'
+
+## Print all the text between 2 words, in this case "AUTO" and "REMOVETHIS" :
+cat my_file.txt | awk '/^#AUTO/,/REMOVETHIS /'  
+
+## Print a NEW LINE every 3 (.e.g.) awk records.  Useful if you have one long string of records.
+echo $foo | awk '{for (i=1; i<=NF; i++){ if (i%3==0) {print $(i-2), $(i-1), $i}}}'
+
+## IF a RECORD BEGINS with "H" print the line
+echo Hello There | awk /^T/' { print $0}'
+
+## IF a RECORD CONTAINS a string print the line
+echo Hello There | awk /^H/' { print $0}'
+
+## IF a LINE (RECORD) BEGINS with "H" print the something:
+echo Hello There | awk /^H/' { print "Hello Where?"}'
+
+## IF a FIELD BEGINS with "T" print the something:
+echo Hello There | awk '{ if($2 ~/^T/) print "Hello Where?"}'
+
+## IF a FIELD CONTAINS "ere" print the something:
+echo Hello There | awk '{ if($2 ~/ere/) print "Hello Where?"}'
+
+## Linux check, IF a field BEGINS with ..., too:
+ if ( "$what_to_check" =~ S* ) goto shutters
+
+## Linux check, IF a field CONTAINS with ..., too:
+ if ( "$what_to_check" =~ *S* ) goto shutters
+
+remove ALL single quotes and replace them with ***
+-->>>  cat some_file.txt | awk '{gsub ("[\047]", "***" ); print $0}'
+
+remove all lines that START with a single quote "'"
+ -->>>  cat some_file.txt | awk '! /^[\047]/{print $0}'
+
+print every 16th entry,
+-->>>   cat some_file.txt  | awk '{if (((NR)/16) % 1 == 0) print $0}' 
+-OR>>   cat some_file.txt  | awk '{if (NR % 16 == 0) print $0}'
+
+##  Pass a number VARIABLE into awk; parse a file for a field with that number 
+# print All the record number(s) which have that value in field #1
+ -->>> cat some_file.txt | awk -v n=$n '{ if ($1 == n) print NR}'
+
+   $$$$$ useful copy/paste to get FIELD numbers in a file or string:   $$$$$ 
+
+tail -1 some_file.txt | \
+awk '{print " 1: " $1, " 2: " $2, " 3: " $3, " 4: " $4, " 5: " $5, " 6: " $6, " 7: " $7, " 8: " $8, " 9: " $9, " 10: " $10, " 11: " $11, " 12: " $12, " 13: " $13, " 14: " $14, " 15: " $15, " 16: " $16, " 17: " $17, " 18: " $18, " 19: " $19, " 20: " $20}' 
+
+
+set foo = `ls -lrt | tail -1`
+echo $foo |awk '{print " 1: " $1, " 2: " $2, " 3: " $3, " 4: " $4, " 5: " $5, " 6: " $6, " 7: " $7, " 8: " $8, " 9: " $9, " 10: " $10}'
+  
+-->>>  1: -rw-rw-rw-  2: 1  3: mcfuser  4: 831_user  5: 120  6: Oct  7: 17  8: 14:32  9: file.num  10:
