@@ -13,6 +13,9 @@ unpigz -c <filename> | sed -n '1~4s/^@/>/p;2~4p' | pigz -c > <output_file>
 #tab sep a file out in shell
 column -t -s$'\t' checkm_output.txt
 
+# trim a fasta file by X length
+awk -v RS='>[^\n]+\n' 'length() >= 30 {printf "%s", prt $0} {prt = RT}' file
+
 #covert multifasta to fasta
 for i in *.faa; do grep -v "^>" $i | awk 'BEGIN { ORS=""; print ">REPLACE_ME\n"} {print}' | sed "s/^>REPLACE_ME/$(basename $i _Glimmer.faa)/g" > $(basename $i _Glimmer.faa)_condensed.faa; done
 
@@ -27,11 +30,11 @@ bbwrap.sh ref=AE1712_3_80m_1k_reformatted.fasta \
 in=AE1712_3_interleaved_80m.qtrimmed.fq.gz,AE1712_3_interleaved_80m.merged.fq.gz \
 nodisk=t out=mapped.bam append bs=bs.sh; sh bs.sh
 
-#pass varaibles into .PBSscripts
-!for i in $(cat biller.txt); do echo $i; qsub -v j=$i map.PBS; sleep 0.5; done
+#pass variables into .SLURM scripts
+while read line; do sed "s/REPLACE_ME/$line/g" abc.SLURM > tmp.SLRUM; sbatch tmp.SLURM; done 
 
 #split a multifasta by contig into new files
-cat ../VIRSorter_cat1245_10k.fasta | awk '{if (substr($0, 1, 1)==">") {filename=(substr($0,2) ".fa")} print $0 >filename}'
+awk '{if (substr($0, 1, 1)==">") {filename=(substr($0,2) ".fa")} print $0 >filename}' file 
 
 nice colours / new_colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728',
               '#9467bd', '#8c564b', '#e377c2', '#7f7f7f',
