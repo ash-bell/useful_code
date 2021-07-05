@@ -16,6 +16,9 @@ column -t -s$'\t' checkm_output.txt
 # trim a fasta file by X length
 awk -v RS='>[^\n]+\n' 'length() >= 30 {printf "%s", prt $0} {prt = RT}' file
 
+#remove files with less than 3 lines (remove echo when happy)
+find . -type f -exec awk -v x=3 'NR==x{exit 1}' {} \; -exec echo rm -f {} \;
+
 #covert multifasta to fasta
 for i in *.faa; do grep -v "^>" $i | awk 'BEGIN { ORS=""; print ">REPLACE_ME\n"} {print}' | sed "s/^>REPLACE_ME/$(basename $i _Glimmer.faa)/g" > $(basename $i _Glimmer.faa)_condensed.faa; done
 
